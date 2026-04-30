@@ -213,30 +213,34 @@ export default function AgendaPage() {
   return (
     <div ref={containerRef} className="flex flex-col" style={{ height: 'calc(100dvh - 56px - env(safe-area-inset-bottom))' }}>
       {refreshing && (
-        <div className="flex justify-center py-2 bg-amber-50 text-amber-600 text-xs font-medium">
+        <div className="flex justify-center py-2 text-xs font-semibold"
+          style={{ background: 'rgba(201,168,97,0.1)', color: '#C9A861' }}>
           Atualizando...
         </div>
       )}
       {/* Action Bar */}
-      <div className="bg-white border-b border-gray-100">
+      <div style={{ background: '#0A0A0A', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Top row: view toggles + search */}
-        <div className="flex items-center justify-between px-3 pt-2 pb-1 gap-2">
+        <div className="flex items-center justify-between px-3 pt-2 pb-2 gap-2">
           {/* View Mode Pills */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
+          <div className="flex items-center rounded-xl p-1 gap-0.5"
+            style={{ background: 'rgba(255,255,255,0.06)' }}>
             <button
               onClick={() => setViewMode('day')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                viewMode === 'day' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all"
+              style={viewMode === 'day'
+                ? { background: '#C9A861', color: '#000' }
+                : { color: 'rgba(255,255,255,0.45)' }}
             >
               <CalendarDays className="w-4 h-4" />
               <span>Dia</span>
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                viewMode === 'list' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all"
+              style={viewMode === 'list'
+                ? { background: '#C9A861', color: '#000' }
+                : { color: 'rgba(255,255,255,0.45)' }}
             >
               <List className="w-4 h-4" />
               <span>Lista</span>
@@ -245,9 +249,10 @@ export default function AgendaPage() {
 
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className={`p-2.5 rounded-xl transition-colors ${
-              showSearch ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500'
-            }`}
+            className="p-2.5 rounded-xl transition-colors"
+            style={showSearch
+              ? { background: 'rgba(201,168,97,0.15)', color: '#C9A861' }
+              : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)' }}
           >
             <Search className="w-4 h-4" />
           </button>
@@ -256,7 +261,8 @@ export default function AgendaPage() {
         {/* Professional Filter */}
         <div className="px-3 pb-2">
           <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
-            <SelectTrigger className="w-full h-10 text-sm bg-gray-50 border-gray-200">
+            <SelectTrigger className="w-full h-10 text-sm"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.7)' }}>
               <SelectValue placeholder="Filtrar por profissional" />
             </SelectTrigger>
             <SelectContent>
@@ -278,20 +284,19 @@ export default function AgendaPage() {
             exit={{ opacity: 0, height: 0 }}
             className="px-3 pb-2 space-y-2"
           >
-            {/* Appointment/Service Search */}
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2"
+                style={{ color: 'rgba(255,255,255,0.3)' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por cliente ou serviço..."
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-white focus:outline-none"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
               />
             </div>
-
-            {/* Client Search */}
-            <ClientSearchBar 
+            <ClientSearchBar
               clients={clients}
               onClientSelect={handleClientSelect}
               onClear={() => setSearchQuery('')}
@@ -328,46 +333,56 @@ export default function AgendaPage() {
 
       {/* Week View */}
       {viewMode === 'week' && (
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-          <div className="text-center py-12">
-            <CalendarIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500">Vista semanal em desenvolvimento</p>
+        <div className="flex-1 overflow-y-auto p-4" style={{ background: '#080808' }}>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+              style={{ background: 'rgba(201,168,97,0.08)' }}>
+              <CalendarIcon className="w-7 h-7" style={{ color: 'rgba(201,168,97,0.4)' }} />
+            </div>
+            <p className="font-bold text-white">Vista semanal</p>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Em desenvolvimento
+            </p>
           </div>
         </div>
       )}
 
       {/* List View */}
       {viewMode === 'list' && (
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ background: '#080808' }}>
           {filteredAppointments.length > 0 ? (
             filteredAppointments.map((apt, index) => (
               <motion.div
                 key={apt.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => {
-                  setSelectedAppointment(apt);
-                  setModalOpen(true);
-                }}
-                className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow"
+                transition={{ delay: Math.min(index * 0.04, 0.3) }}
+                onClick={() => { setSelectedAppointment(apt); setModalOpen(true); }}
+                className="rounded-2xl p-4 cursor-pointer transition-all active:opacity-80"
+                style={{ background: '#0E0E0E', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{apt.client_name}</h3>
-                    <p className="text-sm text-gray-500">{apt.professional_name}</p>
+                    <h3 className="font-semibold text-white text-sm">{apt.client_name}</h3>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      {apt.professional_name}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium gold-text">{apt.start_time}</p>
+                    <p className="text-sm font-bold" style={{ color: '#C9A861' }}>{apt.start_time}</p>
                     {apt.total_amount > 0 && (
-                      <p className="text-sm font-bold">R$ {fmtMoney(apt.total_amount)}</p>
+                      <p className="text-xs font-semibold mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        R$ {fmtMoney(apt.total_amount)}
+                      </p>
                     )}
                   </div>
                 </div>
                 {apt.services && apt.services.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1 mt-1">
                     {apt.services.map((service, idx) => (
-                      <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                      <span key={idx}
+                        className="text-xs px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: 'rgba(201,168,97,0.1)', color: 'rgba(201,168,97,0.8)' }}>
                         {service.name}
                       </span>
                     ))}
@@ -376,9 +391,15 @@ export default function AgendaPage() {
               </motion.div>
             ))
           ) : (
-            <div className="text-center py-12">
-              <List className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">Nenhum agendamento encontrado</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                style={{ background: 'rgba(201,168,97,0.08)' }}>
+                <List className="w-7 h-7" style={{ color: 'rgba(201,168,97,0.4)' }} />
+              </div>
+              <p className="font-bold text-white text-base">Nenhum agendamento</p>
+              <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                Nenhum agendamento nesta data
+              </p>
             </div>
           )}
         </div>

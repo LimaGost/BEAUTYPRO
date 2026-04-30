@@ -1,74 +1,90 @@
+// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Gift, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+const GOLD = '#C9A861';
+
 export default function ClientCard({ client, onClick }) {
   const initials = `${client.first_name?.charAt(0) || ''}${client.last_name?.charAt(0) || ''}`.toUpperCase();
 
   const today = new Date();
   const birthdayDate = client.birthdate ? new Date(client.birthdate + 'T00:00:00') : null;
-  const isBirthdayToday  = birthdayDate &&
+  const isBirthdayToday = birthdayDate &&
     birthdayDate.getDate()  === today.getDate() &&
     birthdayDate.getMonth() === today.getMonth();
-  const isBirthdayMonth  = birthdayDate &&
-    !isBirthdayToday &&
+  const isBirthdayMonth = birthdayDate && !isBirthdayToday &&
     birthdayDate.getMonth() === today.getMonth();
 
   return (
     <motion.div
       whileTap={{ scale: 0.98 }}
       onClick={() => onClick(client)}
-      className={`bg-white rounded-xl p-4 shadow-sm border cursor-pointer hover:shadow-md transition-all ${
-        isBirthdayToday ? 'border-amber-400 ring-1 ring-amber-300' : 'border-gray-100'
-      }`}
+      className="rounded-2xl p-4 cursor-pointer transition-all active:opacity-80"
+      style={{
+        background: '#0E0E0E',
+        border: isBirthdayToday
+          ? '1px solid rgba(201,168,97,0.5)'
+          : '1px solid rgba(255,255,255,0.07)',
+        boxShadow: isBirthdayToday ? '0 0 12px rgba(201,168,97,0.08)' : 'none',
+      }}
     >
       <div className="flex items-center gap-4">
-        <div className="relative w-14 h-14 flex-shrink-0">
-          <div className="w-14 h-14 rounded-full gold-gradient flex items-center justify-center">
-            <span className="text-black font-bold text-lg">{initials}</span>
+        {/* Avatar */}
+        <div className="relative w-12 h-12 flex-shrink-0">
+          <div className="w-12 h-12 rounded-full gold-gradient flex items-center justify-center">
+            <span className="text-black font-bold text-base">{initials || '?'}</span>
           </div>
           {isBirthdayToday && (
-            <span className="absolute -top-1 -right-1 text-base">🎂</span>
+            <span className="absolute -top-1 -right-1 text-sm">🎂</span>
           )}
         </div>
 
+        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-900 truncate">
+            <h3 className="font-semibold text-white truncate text-sm">
               {client.first_name} {client.last_name}
             </h3>
             {isBirthdayMonth && !isBirthdayToday && (
-              <span className="text-sm" title="Aniversário este mês">🎁</span>
+              <span className="text-sm flex-shrink-0" title="Aniversário este mês">🎁</span>
             )}
           </div>
 
-          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-            <Phone className="w-4 h-4" />
-            <span>{client.phone}</span>
-          </div>
+          {client.phone && (
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Phone className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                {client.phone}
+              </span>
+            </div>
+          )}
 
           {birthdayDate && (
-            <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
-              <Gift className="w-3 h-3" />
-              <span>{format(birthdayDate, 'dd/MM', { locale: ptBR })}</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Gift className="w-3 h-3 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                {format(birthdayDate, 'dd/MM', { locale: ptBR })}
+              </span>
             </div>
           )}
         </div>
 
-        <div className="text-right">
+        {/* Stats + chevron */}
+        <div className="text-right flex-shrink-0">
           {client.total_spent > 0 && (
             <div className="mb-1">
-              <p className="text-sm font-bold gold-text">
+              <p className="text-sm font-bold" style={{ color: GOLD }}>
                 R$ {(client.total_spent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
                 {client.visit_count || 0} visitas
               </p>
             </div>
           )}
-          <ChevronRight className="w-5 h-5 text-gray-400" />
+          <ChevronRight className="w-4 h-4 ml-auto" style={{ color: 'rgba(255,255,255,0.2)' }} />
         </div>
       </div>
     </motion.div>

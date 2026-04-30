@@ -1,72 +1,68 @@
-/**
- * Clients — View
- *
- * Responsabilidade: renderizar a listagem e gerenciar estado de UI local.
- * Toda a lógica de dados é delegada ao hook useClients (Controller).
- */
+// @ts-nocheck
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, Users, Smartphone, ArrowUpDown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Users, Plus, ArrowUpDown, Smartphone } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import usePullToRefresh from '@/hooks/usePullToRefresh';
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from '@/hooks/useClients';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+import { SearchInput } from '@/components/ui/SearchInput';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { StatCard } from '@/components/ui/StatCard';
 import ClientCard from '../components/clients/ClientCard';
 import ClientModal from '../components/clients/ClientModal';
 import ImportContactsModal from '../components/clients/ImportContactsModal';
 
+const GOLD = '#C9A861';
+
+const SORT_OPTIONS = [
+  { value: 'nome',    label: 'Nome (A–Z)' },
+  { value: 'gasto',  label: 'Maior gasto' },
+  { value: 'visitas',label: 'Mais visitas' },
+  { value: 'recente',label: 'Mais recentes' },
+];
+
 export default function ClientsPage() {
-  // ── Estado de UI ──────────────────────────────────────────────────────────
   const [searchQuery,     setSearchQuery]     = useState('');
   const [modalOpen,       setModalOpen]       = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [selectedClient,  setSelectedClient]  = useState(null);
   const [sortBy,          setSortBy]          = useState('nome');
 
-  // ── Dados (Controller) ────────────────────────────────────────────────────
   const { user }                          = useAuth();
   const { data: clients = [], isLoading } = useClients();
   const createClient                      = useCreateClient();
   const updateClient                      = useUpdateClient();
   const deleteClient                      = useDeleteClient();
 
-  // Pull-to-refresh invalida o cache manualmente
-  const queryClient  = useQueryClient();
+  const queryClient   = useQueryClient();
   const handleRefresh = useCallback(
     () => queryClient.invalidateQueries({ queryKey: ['clients'] }),
-    [queryClient]
+    [queryClient],
   );
   const { refreshing, containerRef } = usePullToRefresh(handleRefresh);
 
-  // ── Derivações ────────────────────────────────────────────────────────────
+  /* ── Derivações ─────────────────────────────────────────────────────────── */
 
-  const newClients = clients.filter(c => {
+  const newClients = clients.filter((c) => {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 30);
     return new Date(c.created_date) >= cutoff;
   });
 
-  const top3 = [...clients]
-    .sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0))
-    .slice(0, 3);
-
   const sortedClients = [...clients].sort((a, b) => {
-    if (sortBy === 'visitas') return (b.visit_count || 0) - (a.visit_count || 0);
-    if (sortBy === 'gasto')   return (b.total_spent || 0) - (a.total_spent || 0);
+    if (sortBy === 'visitas') return (b.visit_count || 0)  - (a.visit_count || 0);
+    if (sortBy === 'gasto')   return (b.total_spent || 0)  - (a.total_spent || 0);
     if (sortBy === 'recente') return new Date(b.created_date || 0) - new Date(a.created_date || 0);
     return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`, 'pt-BR');
   });
 
-  const filteredClients = sortedClients.filter(c =>
+  const filteredClients = sortedClients.filter((c) =>
     `${c.first_name} ${c.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.phone?.includes(searchQuery)
+    c.phone?.includes(searchQuery),
   );
 
-  // ── Handlers de UI ────────────────────────────────────────────────────────
+  /* ── Handlers ────────────────────────────────────────────────────────────── */
 
   const closeModal = () => { setModalOpen(false); setSelectedClient(null); };
 
@@ -78,118 +74,113 @@ export default function ClientsPage() {
   };
 
   const handleImportContacts = async (contacts) => {
-    await Promise.all(contacts.map(c => createClient.mutateAsync(c)));
+    await Promise.all(contacts.map((c) => createClient.mutateAsync(c)));
     setImportModalOpen(false);
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  /* ── Render ──────────────────────────────────────────────────────────────── */
 
   return (
-    <div ref={containerRef} className="min-h-screen page-bg">
+    <div ref={containerRef} className="min-h-screen" style={{ background: '#080808' }}>
+
       {refreshing && (
-        <div className="flex justify-center py-2 bg-amber-50 text-amber-600 text-xs font-medium">
+        <div className="flex justify-center py-2 text-xs font-semibold"
+          style={{ background: 'rgba(201,168,97,0.1)', color: GOLD }}>
           Atualizando...
         </div>
       )}
 
-      {/* Header com estatísticas */}
-      <div className="bg-gradient-to-r from-amber-500 to-amber-600 p-6 text-white">
-        <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold">{clients.length}</p>
-            <p className="text-xs opacity-90">Total de Clientes</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold">{newClients.length}</p>
-            <p className="text-xs opacity-90">Novos (30 dias)</p>
-          </div>
-        </div>
-
-        {clients.length > 0 && (
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-            <h3 className="text-sm font-medium mb-3 opacity-90">🏆 Top 3 Clientes</h3>
-            <div className="space-y-2">
-              {top3.map((client, index) => (
-                <div key={client.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{['🥇', '🥈', '🥉'][index]}</span>
-                    <span className="font-medium text-sm">
-                      {client.first_name} {client.last_name}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-sm">
-                      R$ {(client.total_spent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-xs opacity-75">{client.visit_count || 0} visitas</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 gap-3 px-4 pt-4 pb-3">
+        <StatCard
+          icon={Users}
+          label="Total de clientes"
+          value={isLoading ? '—' : clients.length}
+          color="#60A5FA"
+          delay={0}
+        />
+        <StatCard
+          icon={Users}
+          label="Novos (30 dias)"
+          value={isLoading ? '—' : newClients.length}
+          color="#34D399"
+          delay={0.05}
+        />
       </div>
 
       {/* Busca + Ordenação */}
-      <div className="p-4 space-y-2">
-        <div className="relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por nome ou telefone..."
-            className="pl-10 h-12 rounded-xl bg-white"
-          />
+      <div className="px-4 pb-3 space-y-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onClear={() => setSearchQuery('')}
+          placeholder="Buscar por nome ou telefone..."
+        />
+
+        {/* Sort pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-0.5">
+          <ArrowUpDown className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+          {SORT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setSortBy(opt.value)}
+              className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+              style={
+                sortBy === opt.value
+                  ? { background: 'rgba(201,168,97,0.18)', color: GOLD, border: '1px solid rgba(201,168,97,0.35)' }
+                  : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.08)' }
+              }
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="h-9 text-sm bg-white flex-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="nome">Nome (A-Z)</SelectItem>
-              <SelectItem value="gasto">Maior gasto</SelectItem>
-              <SelectItem value="visitas">Mais visitas</SelectItem>
-              <SelectItem value="recente">Mais recentes</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+
+        <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.25)' }}>
+          {filteredClients.length} {filteredClients.length === 1 ? 'cliente' : 'clientes'}
+        </p>
       </div>
 
       {/* Lista */}
-      <div className="px-4 pb-24 space-y-3">
+      <div className="px-4 pt-3 pb-28 space-y-2">
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gray-200" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-32 mb-2" />
-                    <div className="h-3 bg-gray-100 rounded w-24" />
-                  </div>
+          [1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="rounded-2xl p-4 animate-pulse"
+              style={{ background: '#0E0E0E', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 rounded-lg w-32" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <div className="h-3 rounded-lg w-24" style={{ background: 'rgba(255,255,255,0.04)' }} />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         ) : filteredClients.length === 0 ? (
-          <div className="text-center py-12">
-            <Users className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-1">
-              {searchQuery ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
-            </h3>
-            <p className="text-sm text-gray-400">
-              {searchQuery ? 'Tente buscar por outro termo' : 'Adicione seu primeiro cliente'}
-            </p>
-          </div>
+          <EmptyState
+            icon={Users}
+            title={searchQuery ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
+            description={searchQuery ? 'Tente buscar por outro termo' : 'Adicione seu primeiro cliente'}
+            action={
+              !searchQuery && (
+                <button
+                  onClick={() => { setSelectedClient(null); setModalOpen(true); }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-black"
+                  style={{ background: 'linear-gradient(135deg,#C9A861,#E5D4A8)' }}
+                >
+                  <Users className="w-4 h-4" />
+                  Novo cliente
+                </button>
+              )
+            }
+          />
         ) : (
           filteredClients.map((client, index) => (
             <motion.div
               key={client.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: Math.min(index * 0.04, 0.3) }}
             >
               <ClientCard
                 client={client}
@@ -202,14 +193,19 @@ export default function ClientsPage() {
 
       {/* FABs */}
       <div
-        className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-30"
-        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}
+        className="fixed flex flex-col items-end gap-3 z-30"
+        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))', right: '1rem' }}
       >
         {user?.role === 'admin' && (
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setImportModalOpen(true)}
-            className="flex items-center gap-2 bg-white border border-amber-300 text-amber-700 font-semibold text-sm px-4 h-12 rounded-full shadow-lg"
+            className="flex items-center gap-2 font-semibold text-sm px-4 h-11 rounded-full"
+            style={{
+              background: 'rgba(201,168,97,0.12)',
+              color: GOLD,
+              border: '1px solid rgba(201,168,97,0.25)',
+            }}
           >
             <Smartphone className="w-4 h-4" />
             Importar Contatos
