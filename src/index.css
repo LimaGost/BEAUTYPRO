@@ -4,24 +4,36 @@
 
 /* ── Mobile / iOS fundamentals ──────────────────────────────────────────── */
 
-html, body {
+html,
+body {
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
-* { -webkit-tap-highlight-color: transparent; }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
-input, textarea, select { font-size: 16px !important; }
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
 
-button, a, [role="button"] {
+button,
+a,
+[role="button"] {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
 }
 
-.overflow-y-auto, .overflow-y-scroll { -webkit-overflow-scrolling: touch; }
+.overflow-y-auto,
+.overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+}
 
 /* ── Shadcn / Tailwind CSS variables ─────────────────────────────────────── */
 
@@ -62,10 +74,10 @@ button, a, [role="button"] {
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* BeautyPro design tokens */
-    --gold:       #C9A861;
+    --gold: #C9A861;
     --gold-light: #E5D4A8;
-    --gold-dark:  #9A7B3D;
-    --app-bg:     #F4F3F0;
+    --gold-dark: #9A7B3D;
+    --app-bg: #F4F3F0;
   }
 
   .dark {
@@ -103,7 +115,9 @@ button, a, [role="button"] {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  * { @apply border-border outline-ring/50; }
+  * {
+    @apply border-border outline-ring/50;
+  }
 
   body {
     @apply text-foreground;
@@ -114,12 +128,22 @@ button, a, [role="button"] {
 /* ── Design system ───────────────────────────────────────────────────────── */
 
 /* Gold utilities */
-.gold-gradient { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); }
-.gold-text     { color: var(--gold); }
-.gold-border   { border-color: var(--gold); }
+.gold-gradient {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+}
+
+.gold-text {
+  color: var(--gold);
+}
+
+.gold-border {
+  border-color: var(--gold);
+}
 
 /* Page background */
-.page-bg { background-color: var(--app-bg); }
+.page-bg {
+  background-color: var(--app-bg);
+}
 
 /* Card surface */
 .card-surface {
@@ -158,17 +182,69 @@ button, a, [role="button"] {
   cursor: pointer;
   transition: background-color 0.1s ease;
 }
-.list-row:active { background-color: #FAFAF8; }
+
+.list-row:active {
+  background-color: #FAFAF8;
+}
 
 /* Status badges */
-.badge-red   { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; background:#FEF2F2; color:#DC2626; border:1px solid #FEE2E2; }
-.badge-green { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; background:#F0FDF4; color:#16A34A; border:1px solid #DCFCE7; }
-.badge-amber { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; background:#FFFBEB; color:#D97706; border:1px solid #FDE68A; }
-.badge-gray  { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:600; background:#F9FAFB; color:#6B7280; border:1px solid #F3F4F6; }
+.badge-red {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FEE2E2;
+}
+
+.badge-green {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #F0FDF4;
+  color: #16A34A;
+  border: 1px solid #DCFCE7;
+}
+
+.badge-amber {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+.badge-gray {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #F9FAFB;
+  color: #6B7280;
+  border: 1px solid #F3F4F6;
+}
 
 /* Scrollbar hide */
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* Summary stat row */
 .stat-row {
@@ -182,7 +258,20 @@ button, a, [role="button"] {
 
 /* Smooth page entry */
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.page-enter { animation: page-in 0.22s ease both; }
+
+.page-enter {
+  animation: page-in 0.22s ease both;
+}
+
+
+// ── teste npva feature ─────────────────────────
