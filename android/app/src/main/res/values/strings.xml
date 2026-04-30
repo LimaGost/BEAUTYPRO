@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BeautyPro</string>
+    <string name="title_activity_main">BeautyPro</string>
+    <string name="package_name">com.mustech.beautypro</string>
+    <string name="custom_url_scheme">com.mustech.beautypro</string>
+</resources>
